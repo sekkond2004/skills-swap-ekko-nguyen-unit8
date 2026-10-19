@@ -161,3 +161,92 @@ main > .hero {
         font-size: 1.8rem;
     }
 }
+
+/* ---------- Skill cards ---------- */
+/* AI-generated (Claude): card grid and card styles */
+.section-intro {
+    color: var(--muted);
+    margin-bottom: 24px;
+}
+
+/* CSS Grid: cards fill the row and wrap automatically on smaller screens */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    align-items: start;
+}
+
+.skill-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.skill-card:hover,
+.skill-card:focus {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(29, 36, 51, 0.12);
+    outline: none;
+}
+
+.skill-card.expanded {
+    border-color: var(--primary);
+}
+
+.tag {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #e7efff;
+    color: var(--primary);
+}
+
+.card-title {
+    font-size: 1.2rem;
+}
+
+.card-desc {
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+}
+
+.provider {
+    font-weight: 500;
+}
+
+.price {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Details are hidden until the card is clicked (toggled by script.js) */
+.card-details {
+    display: none;
+    font-size: 0.9rem;
+    color: var(--muted);
+    padding-top: 8px;
+}
+
+.skill-card.expanded .card-details {
+    display: block;
+}
