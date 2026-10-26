@@ -1,0 +1,24 @@
+{
+  "name": "unit8-fresh",
+  "version": "1.0.0",
+  "description": "Skill Swap is a peer-to-peer marketplace where college students can offer the skills they're good at (tutoring, coding help, design, music lessons, and more) and find classmates who can help them learn something new. Providers build a credentialed profile and set an hourly rate per skill, and learners search and filter to find the right person.",
+  "main": "script.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sekkond2004/skills-swap-ekko-nguyen-unit8.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sekkond2004/skills-swap-ekko-nguyen-unit8/issues"
+  },
+  "homepage": "https://github.com/sekkond2004/skills-swap-ekko-nguyen-unit8#readme",
+  "devDependencies": {
+    "jest": "^30.5.2"
+  }
+}
