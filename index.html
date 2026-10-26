@@ -17,6 +17,7 @@
                 <li><a href="#home">Home</a></li>
                 <li><a href="#skills">Browse Skills</a></li>
                 <li><a href="#calculator">Cost Calculator</a></li>
+                <li><a href="#match">Find a Match</a></li>
                 <li><a href="#offer">Offer Skills</a></li>
                 <li><a href="#about">About</a></li>
             </ul>
@@ -66,6 +67,34 @@
                     <button type="submit" class="btn">Calculate</button>
                 </form>
                 <p class="tool-result" id="cost-result" aria-live="polite"></p>
+            </div>
+        </section>
+
+        <!-- AI-generated (Claude): skill matcher. script.js calls matchSkillsToUser() -->
+        <section class="tool-section" id="match">
+            <div class="tool-panel">
+                <h2>Find My Match</h2>
+                <p class="section-intro">Pick what you want to learn and the most you want to pay per hour.</p>
+                <form id="match-form" class="tool-form" novalidate>
+                    <label>
+                        Category
+                        <select id="match-category">
+                            <option value="Programming">Programming</option>
+                            <option value="Music">Music</option>
+                            <option value="Career">Career</option>
+                            <option value="Design">Design</option>
+                            <option value="Math">Math</option>
+                            <option value="All">Any category</option>
+                        </select>
+                    </label>
+                    <label>
+                        Max price ($/hr)
+                        <input type="number" id="max-price-input" min="0" step="1" placeholder="20">
+                    </label>
+                    <button type="submit" class="btn">Find My Match</button>
+                </form>
+                <p class="tool-result" id="match-summary" aria-live="polite"></p>
+                <div class="card-grid" id="match-results"></div>
             </div>
         </section>
 

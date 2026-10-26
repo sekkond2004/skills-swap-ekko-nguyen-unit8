@@ -1,5 +1,5 @@
 const skillswap = require('../skillswap-functions');
-const { filterSkillsByCategory, calculateTotalCost } = skillswap;
+const { filterSkillsByCategory, calculateTotalCost, matchSkillsToUser } = skillswap;
 
 describe('test setup', () => {
   test('skillswap-functions module loads', () => {
@@ -77,5 +77,53 @@ describe('calculateTotalCost', () => {
 
   test('rounds to the nearest cent', () => {
     expect(calculateTotalCost(19.99, 3)).toBe(59.97);
+  });
+});
+
+describe('matchSkillsToUser', () => {
+  const skills = [
+    { title: 'Python Tutoring', category: 'Programming', price: 20 },
+    { title: 'JavaScript Help', category: 'Programming', price: 25 },
+    { title: 'Guitar Lessons', category: 'Music', price: 15 },
+    { title: 'Resume Review', category: 'Career', price: 0 },
+  ];
+
+  test('matches skills by category and price', () => {
+    const needs = { category: 'Programming', maxPrice: 30 };
+    expect(matchSkillsToUser(needs, skills)).toEqual([
+      { title: 'Python Tutoring', category: 'Programming', price: 20 },
+      { title: 'JavaScript Help', category: 'Programming', price: 25 },
+    ]);
+  });
+
+  test('filters out skills above the max price (price equal to max is kept)', () => {
+    const needs = { category: 'Programming', maxPrice: 20 };
+    expect(matchSkillsToUser(needs, skills)).toEqual([
+      { title: 'Python Tutoring', category: 'Programming', price: 20 },
+    ]);
+  });
+
+  test('returns an empty array when no category matches', () => {
+    const needs = { category: 'Cooking', maxPrice: 100 };
+    expect(matchSkillsToUser(needs, skills)).toEqual([]);
+  });
+
+  test('returns an empty array when everything is over budget', () => {
+    const needs = { category: 'Music', maxPrice: 10 };
+    expect(matchSkillsToUser(needs, skills)).toEqual([]);
+  });
+
+  test('includes free skills when the max price is 0', () => {
+    const needs = { category: 'Career', maxPrice: 0 };
+    expect(matchSkillsToUser(needs, skills)).toEqual([
+      { title: 'Resume Review', category: 'Career', price: 0 },
+    ]);
+  });
+
+  test('includes free skills alongside paid ones within budget', () => {
+    const needs = { category: 'Career', maxPrice: 50 };
+    expect(matchSkillsToUser(needs, skills)).toEqual([
+      { title: 'Resume Review', category: 'Career', price: 0 },
+    ]);
   });
 });

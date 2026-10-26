@@ -34,8 +34,26 @@ function calculateTotalCost(hourlyRate, hours) {
   return Math.round(rate * time * 100) / 100;
 }
 
+/**
+ * Skills in the user's preferred category that fit their budget.
+ * A skill priced exactly at maxPrice is included, and free skills
+ * (price 0) always fit any budget of 0 or more.
+ * @param {{category: string, maxPrice: number}} userNeeds
+ * @param {Array<{title: string, category: string, price: number}>} skills
+ * @returns {Array}
+ */
+function matchSkillsToUser(userNeeds, skills) {
+  if (!userNeeds || !Array.isArray(skills)) return [];
+  const { category, maxPrice } = userNeeds;
+  const budget = Number(maxPrice);
+  if (!Number.isFinite(budget)) return [];
+  return filterSkillsByCategory(skills, category).filter(
+    (skill) => skill.price <= budget
+  );
+}
+
 // Export for Jest (Node). The check keeps browsers from throwing
 // "module is not defined" when this file is loaded with a <script> tag.
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { filterSkillsByCategory, calculateTotalCost };
+  module.exports = { filterSkillsByCategory, calculateTotalCost, matchSkillsToUser };
 }
