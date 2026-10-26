@@ -169,3 +169,36 @@ filterButtons.forEach(function (button) {
 });
 
 showCategory("All");
+
+// ---------- Cost calculator ----------
+// AI-generated (Claude): form calls calculateTotalCost()
+const costForm = document.getElementById("cost-form");
+const rateInput = document.getElementById("rate-input");
+const hoursInput = document.getElementById("hours-input");
+const costResult = document.getElementById("cost-result");
+
+costForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    if (rateInput.value.trim() === "" || hoursInput.value.trim() === "") {
+        showMessage(costResult, "Enter both an hourly rate and a number of hours.", true);
+        return;
+    }
+
+    const rate = Number(rateInput.value);
+    const hours = Number(hoursInput.value);
+
+    if (rate < 0 || hours < 0) {
+        showMessage(costResult, "Rate and hours can't be negative.", true);
+        return;
+    }
+
+    const total = calculateTotalCost(rate, hours);
+    const hourLabel = hours === 1 ? "hour" : "hours";
+
+    if (rate === 0) {
+        showMessage(costResult, "Free session: " + hours + " " + hourLabel + " costs $0.00");
+    } else {
+        showMessage(costResult, hours + " " + hourLabel + " at " + formatPrice(rate) + " = $" + total.toFixed(2));
+    }
+});
