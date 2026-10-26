@@ -250,3 +250,50 @@ main > .hero {
 .skill-card.expanded .card-details {
     display: block;
 }
+
+/* ---------- Category filter ---------- */
+/* AI-generated (Claude): filter buttons, result count, free price badge */
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.filter-btn {
+    font: inherit;
+    font-weight: 600;
+    padding: 8px 18px;
+    border: 2px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.filter-btn:hover,
+.filter-btn:focus-visible {
+    border-color: var(--primary);
+    color: var(--primary);
+    outline: none;
+}
+
+.filter-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.result-count {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.price-free {
+    color: #1f7a4d;
+    background: #dcf3e6;
+    padding: 0 10px;
+    border-radius: 999px;
+}
