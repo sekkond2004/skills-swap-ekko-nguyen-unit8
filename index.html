@@ -16,6 +16,7 @@
             <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
                 <li><a href="#skills">Browse Skills</a></li>
+                <li><a href="#calculator">Cost Calculator</a></li>
                 <li><a href="#offer">Offer Skills</a></li>
                 <li><a href="#about">About</a></li>
             </ul>
@@ -46,6 +47,26 @@
 
             <!-- Skill cards are rendered from the skills array in script.js -->
             <div class="card-grid" id="skill-grid"></div>
+        </section>
+
+        <!-- AI-generated (Claude): session cost calculator. script.js calls calculateTotalCost() -->
+        <section class="tool-section" id="calculator">
+            <div class="tool-panel">
+                <h2>Session Cost Calculator</h2>
+                <p class="section-intro">Enter a provider's hourly rate and how long you want to book.</p>
+                <form id="cost-form" class="tool-form" novalidate>
+                    <label>
+                        Hourly rate ($)
+                        <input type="number" id="rate-input" min="0" step="0.01" placeholder="15">
+                    </label>
+                    <label>
+                        Hours
+                        <input type="number" id="hours-input" min="0" step="0.25" placeholder="1.5">
+                    </label>
+                    <button type="submit" class="btn">Calculate</button>
+                </form>
+                <p class="tool-result" id="cost-result" aria-live="polite"></p>
+            </div>
         </section>
 
         <!-- Offer Skills: call to action for providers -->

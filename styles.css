@@ -297,3 +297,79 @@ main > .hero {
     padding: 0 10px;
     border-radius: 999px;
 }
+
+/* ---------- Tool sections (cost calculator, find my match) ---------- */
+/* AI-generated (Claude): shared panel and form styles */
+main > .tool-section {
+    padding-top: 0;
+}
+
+.tool-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+}
+
+.tool-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+.tool-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 200px;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.tool-form input,
+.tool-form select {
+    font: inherit;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+}
+
+.tool-form input:focus,
+.tool-form select:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 1px;
+}
+
+.tool-form .btn {
+    font: inherit;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.tool-result {
+    margin-top: 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    min-height: 1.6em;
+}
+
+.tool-result.error {
+    color: #b42318;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+#match-results {
+    margin-top: 16px;
+}
+
+@media (max-width: 640px) {
+    .tool-panel {
+        padding: 20px;
+    }
+}
