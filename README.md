@@ -7,6 +7,7 @@ Skill Swap is a peer-to-peer marketplace where college students can offer the sk
 - Skill cards that expand to show the provider's background, teaching style, and availability
 - **Category filter**: All / Programming / Music / Career buttons use `filterSkillsByCategory(skills, category)`
 - **Session cost calculator**: hourly rate × hours using `calculateTotalCost(hourlyRate, hours)`, including free sessions, zero hours, and decimal hours
+- **Find My Match**: choose a category and max price; `matchSkillsToUser(userNeeds, skills)` returns skills in that category at or under the budget, including free ones
 
 ## Technologies Used
 - HTML5 (semantic elements)
@@ -34,6 +35,7 @@ Each feature was built on its own branch and merged with a pull request:
 | --- | --- |
 | `feature/filter-skills` | `filterSkillsByCategory` |
 | `feature/calculate-cost` | `calculateTotalCost` |
+| `feature/match-skills` | `matchSkillsToUser` |
 
 ## Author
 Ekko Nguyen

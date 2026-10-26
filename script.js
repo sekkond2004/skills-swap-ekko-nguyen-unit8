@@ -202,3 +202,43 @@ costForm.addEventListener("submit", function (event) {
         showMessage(costResult, hours + " " + hourLabel + " at " + formatPrice(rate) + " = $" + total.toFixed(2));
     }
 });
+
+// ---------- Find my match ----------
+// AI-generated (Claude): form calls matchSkillsToUser()
+const matchForm = document.getElementById("match-form");
+const matchCategory = document.getElementById("match-category");
+const maxPriceInput = document.getElementById("max-price-input");
+const matchSummary = document.getElementById("match-summary");
+const matchResults = document.getElementById("match-results");
+
+matchForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    if (maxPriceInput.value.trim() === "") {
+        showMessage(matchSummary, "Enter the most you want to pay per hour (0 for free skills only).", true);
+        matchResults.replaceChildren();
+        return;
+    }
+
+    const maxPrice = Number(maxPriceInput.value);
+    if (maxPrice < 0) {
+        showMessage(matchSummary, "Max price can't be negative.", true);
+        matchResults.replaceChildren();
+        return;
+    }
+
+    const category = matchCategory.value;
+    const matches = matchSkillsToUser({ category: category, maxPrice: maxPrice }, skills);
+    renderSkills(matches, matchResults);
+
+    const where = category === "All" ? "in any category" : "in " + category;
+    const free = maxPrice === 0 ? "free " : "";
+    const budget = maxPrice === 0 ? "" : " at or under " + formatMoney(maxPrice) + "/hr";
+
+    if (matches.length === 0) {
+        showMessage(matchSummary, "No " + free + "skills " + where + budget + " yet. Try a higher budget or another category.");
+    } else {
+        const noun = matches.length === 1 ? "match" : "matches";
+        showMessage(matchSummary, matches.length + " " + free + noun + " " + where + budget + ".");
+    }
+});
