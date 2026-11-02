@@ -373,3 +373,47 @@ main > .tool-section {
         padding: 20px;
     }
 }
+
+/* ---------- API loading + Offer a Skill form ---------- */
+/* AI-generated (Claude): styles for the Unit 9 API integration */
+.result-count.error {
+    color: #b42318;
+}
+
+#reload-skills {
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 16px;
+}
+
+.offer .tool-panel {
+    text-align: left;
+    margin-top: 8px;
+}
+
+.tool-form .full-width {
+    flex-basis: 100%;
+}
+
+.tool-form textarea {
+    font: inherit;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    resize: vertical;
+    min-height: 96px;
+}
+
+.tool-form textarea:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 1px;
+}
+
+.tool-form .btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+    transform: none;
+}

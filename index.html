@@ -37,16 +37,13 @@
             <h2>Featured Skills</h2>
             <p class="section-intro">Filter by category, then click a card to see more about the provider.</p>
 
-            <!-- AI-generated (Claude): category filter buttons. script.js calls filterSkillsByCategory() -->
-            <div class="filter-bar" role="group" aria-label="Filter skills by category">
-                <button type="button" class="filter-btn active" data-category="All" aria-pressed="true">All</button>
-                <button type="button" class="filter-btn" data-category="Programming" aria-pressed="false">Programming</button>
-                <button type="button" class="filter-btn" data-category="Music" aria-pressed="false">Music</button>
-                <button type="button" class="filter-btn" data-category="Career" aria-pressed="false">Career</button>
-            </div>
+            <!-- AI-generated (Claude): category filter buttons. script.js builds one button
+                 per category in the database and calls filterSkillsByCategory() -->
+            <div class="filter-bar" id="filter-bar" role="group" aria-label="Filter skills by category"></div>
             <p class="result-count" id="result-count" aria-live="polite"></p>
+            <button type="button" class="btn btn-outline" id="reload-skills" hidden>Try again</button>
 
-            <!-- Skill cards are rendered from the skills array in script.js -->
+            <!-- Skill cards are rendered from the API data (GET /api/skills) in script.js -->
             <div class="card-grid" id="skill-grid"></div>
         </section>
 
@@ -78,12 +75,8 @@
                 <form id="match-form" class="tool-form" novalidate>
                     <label>
                         Category
+                        <!-- Options are filled in from the database categories by script.js -->
                         <select id="match-category">
-                            <option value="Programming">Programming</option>
-                            <option value="Music">Music</option>
-                            <option value="Career">Career</option>
-                            <option value="Design">Design</option>
-                            <option value="Math">Math</option>
                             <option value="All">Any category</option>
                         </select>
                     </label>
@@ -117,8 +110,9 @@
         <p>&copy; 2026 Skill Swap. Built by Ekko Nguyen.</p>
     </footer>
 
-    <!-- skillswap-functions.js must load first: script.js uses its functions -->
+    <!-- skillswap-functions.js and api-service.js must load first: script.js uses their functions -->
     <script src="skillswap-functions.js"></script>
+    <script src="api-service.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
