@@ -175,7 +175,7 @@ function buildCategoryControls() {
     }
 
     // Suggestions for the category field in the "Offer a Skill" form
-    if (categoryList) categoryList.replaceChildren(...categories.map(function (category) {
+    categoryList.replaceChildren(...categories.map(function (category) {
         return new Option(category);
     }));
 }
@@ -314,5 +314,62 @@ matchForm.addEventListener("submit", function (event) {
     } else {
         const noun = matches.length === 1 ? "match" : "matches";
         showMessage(matchSummary, matches.length + " " + free + noun + " " + where + budget + ".");
+    }
+});
+
+// ---------- Offer a Skill (create) ----------
+// On submit, send the new skill to the API with createSkill(). Once the
+// database has saved it, reload every skill with loadSkills() so the new
+// card shows up and stays there after a page refresh.
+const skillForm = document.getElementById("skill-form");
+const skillTitleInput = document.getElementById("skill-title");
+const skillCategoryInput = document.getElementById("skill-category");
+const skillPriceInput = document.getElementById("skill-price");
+const skillDescriptionInput = document.getElementById("skill-description");
+const skillFormResult = document.getElementById("skill-form-result");
+const skillSubmitButton = document.getElementById("skill-submit");
+
+skillForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const title = skillTitleInput.value.trim();
+    const category = skillCategoryInput.value.trim();
+    const priceText = skillPriceInput.value.trim();
+    const description = skillDescriptionInput.value.trim();
+
+    if (!title || !category || priceText === "" || !description) {
+        showMessage(skillFormResult, "Fill in the title, category, price, and description.", true);
+        return;
+    }
+
+    const price = Number(priceText);
+    if (!Number.isFinite(price) || price < 0) {
+        showMessage(skillFormResult, "Price must be 0 (free) or more.", true);
+        return;
+    }
+
+    // Stop double submits while the request is in flight
+    skillSubmitButton.disabled = true;
+    showMessage(skillFormResult, "Saving your skill...");
+
+    try {
+        const created = await window.apiService.createSkill({
+            title: title,
+            category: category,
+            price: price,
+            description: description
+        });
+
+        skillForm.reset();
+        await loadSkills();
+        showMessage(skillFormResult, "\"" + (created.title || title) + "\" was added to Skill Swap.");
+    } catch (error) {
+        showMessage(
+            skillFormResult,
+            "Couldn't save your skill. Make sure the backend server is running, then try again.",
+            true
+        );
+    } finally {
+        skillSubmitButton.disabled = false;
     }
 });

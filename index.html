@@ -18,7 +18,7 @@
                 <li><a href="#skills">Browse Skills</a></li>
                 <li><a href="#calculator">Cost Calculator</a></li>
                 <li><a href="#match">Find a Match</a></li>
-                <li><a href="#offer">Offer Skills</a></li>
+                <li><a href="#offer">Offer a Skill</a></li>
                 <li><a href="#about">About</a></li>
             </ul>
         </nav>
@@ -94,8 +94,32 @@
         <!-- Offer Skills: call to action for providers -->
         <section class="offer" id="offer">
             <h2>Have a skill to share?</h2>
-            <p>Create a profile, list what you can teach, and set your own hourly rate.</p>
-            <a href="#" class="btn btn-outline">Offer a Skill</a>
+            <p>List what you can teach and set your own hourly rate. Your skill is saved to the database, so it stays after a refresh.</p>
+
+            <!-- AI-generated (Claude): skill creation form. script.js calls createSkill() on submit -->
+            <div class="tool-panel">
+                <form id="skill-form" class="tool-form" novalidate>
+                    <label>
+                        Title
+                        <input type="text" id="skill-title" name="title" maxlength="100" placeholder="Intro to Photoshop" required>
+                    </label>
+                    <label>
+                        Category
+                        <input type="text" id="skill-category" name="category" list="category-list" maxlength="50" placeholder="Design" required>
+                        <datalist id="category-list"></datalist>
+                    </label>
+                    <label>
+                        Price ($/hr, 0 = free)
+                        <input type="number" id="skill-price" name="price" min="0" step="0.01" placeholder="15" required>
+                    </label>
+                    <label class="full-width">
+                        Description
+                        <textarea id="skill-description" name="description" maxlength="500" rows="3" placeholder="What will learners get out of a session with you?" required></textarea>
+                    </label>
+                    <button type="submit" class="btn" id="skill-submit">Offer a Skill</button>
+                </form>
+                <p class="tool-result" id="skill-form-result" aria-live="polite"></p>
+            </div>
         </section>
 
         <!-- About section -->
