@@ -325,6 +325,7 @@ const skillForm = document.getElementById("skill-form");
 const skillTitleInput = document.getElementById("skill-title");
 const skillCategoryInput = document.getElementById("skill-category");
 const skillPriceInput = document.getElementById("skill-price");
+const skillProviderInput = document.getElementById("skill-provider");
 const skillDescriptionInput = document.getElementById("skill-description");
 const skillFormResult = document.getElementById("skill-form-result");
 const skillSubmitButton = document.getElementById("skill-submit");
@@ -336,6 +337,7 @@ skillForm.addEventListener("submit", async function (event) {
     const category = skillCategoryInput.value.trim();
     const priceText = skillPriceInput.value.trim();
     const description = skillDescriptionInput.value.trim();
+    const provider = skillProviderInput.value.trim();
 
     if (!title || !category || priceText === "" || !description) {
         showMessage(skillFormResult, "Fill in the title, category, price, and description.", true);
@@ -353,12 +355,18 @@ skillForm.addEventListener("submit", async function (event) {
     showMessage(skillFormResult, "Saving your skill...");
 
     try {
-        const created = await window.apiService.createSkill({
+        const newSkill = {
             title: title,
             category: category,
             price: price,
             description: description
-        });
+        };
+        // provider is optional: the backend saves "Anonymous" when it's left out
+        if (provider) {
+            newSkill.provider = provider;
+        }
+
+        const created = await window.apiService.createSkill(newSkill);
 
         skillForm.reset();
         await loadSkills();

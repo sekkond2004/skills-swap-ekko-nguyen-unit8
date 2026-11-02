@@ -422,3 +422,13 @@ main > .tool-section {
     cursor: wait;
     transform: none;
 }
+
+/* Let the four short fields share one row on wide screens */
+#skill-form label:not(.full-width) {
+    flex: 1 1 180px;
+}
+
+#skill-form input {
+    min-width: 0;
+    width: 100%;
+}
