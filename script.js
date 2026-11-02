@@ -1,52 +1,13 @@
 // Skill Swap - main script
 // The testable logic (filter, cost, match) lives in skillswap-functions.js
 // and is covered by Jest tests in __tests__/skillswap.test.js.
-// This file connects those functions to the page.
+// Talking to the backend lives in api-service.js (window.apiService).
+// This file connects those pieces to the page.
 
-// AI-generated (Claude): skill data moved out of the HTML into an array
-// so the filter and matcher functions can work with it.
-const skills = [
-    {
-        title: "Intro to Python", category: "Programming", price: 15, provider: "Maya Chen",
-        description: "Get unstuck on loops, functions, and your first projects.",
-        background: "CS major, TA for CS 101", style: "Patient with beginners", availability: "Weeknights"
-    },
-    {
-        title: "Web Development Basics", category: "Programming", price: 20, provider: "Leo Martinez",
-        description: "Build and publish your first site with HTML, CSS, and JavaScript.",
-        background: "Info Sci major, freelance web developer", style: "Build-along projects", availability: "Weekends"
-    },
-    {
-        title: "Guitar for Beginners", category: "Music", price: 12, provider: "Jordan Ruiz",
-        description: "Learn chords, strumming patterns, and your first full song.",
-        background: "Music minor, 8 years playing", style: "Song-based, hands-on", availability: "Weekends"
-    },
-    {
-        title: "Music Theory Study Group", category: "Music", price: 0, provider: "Ava Thompson",
-        description: "A free weekly group session on scales, chords, and ear training.",
-        background: "Music major, choir section leader", style: "Group practice", availability: "Fridays"
-    },
-    {
-        title: "Resume Review", category: "Career", price: 0, provider: "Marcus Johnson",
-        description: "Free line-by-line feedback before you apply for internships.",
-        background: "Career center peer advisor", style: "Quick, actionable notes", availability: "Drop-in, Mon - Fri"
-    },
-    {
-        title: "Mock Interviews", category: "Career", price: 25, provider: "Aisha Bello",
-        description: "Practice behavioral and technical interviews and get feedback.",
-        background: "Interned at two tech companies", style: "Realistic practice, honest feedback", availability: "Sunday afternoons"
-    },
-    {
-        title: "Resume & Portfolio Design", category: "Design", price: 20, provider: "Priya Patel",
-        description: "Make your resume and portfolio stand out to recruiters.",
-        background: "Graphic design major, Figma certified", style: "Detailed feedback, side-by-side edits", availability: "Mon / Wed afternoons"
-    },
-    {
-        title: "Calculus I Tutoring", category: "Math", price: 18, provider: "Sam Okafor",
-        description: "Limits, derivatives, and exam prep made understandable.",
-        background: "Math major, 3.9 GPA in calc sequence", style: "Practice problems first", availability: "Tue / Thu evenings"
-    }
-];
+// Skills now come from the database through the API (see loadSkills below).
+// This starts empty and is filled in once the fetch finishes.
+let skills = [];
+let currentCategory = "All";
 
 const skillGrid = document.getElementById("skill-grid");
 
@@ -62,6 +23,19 @@ function formatPrice(price) {
 function showMessage(element, text, isError) {
     element.textContent = text;
     element.classList.toggle("error", Boolean(isError));
+}
+
+// The database can send price as a string (e.g. "15.00") and some fields
+// may be missing, so every skill is cleaned up before the page uses it.
+function normalizeSkill(raw) {
+    const price = Number(raw.price);
+    return {
+        ...raw,
+        title: raw.title || "Untitled skill",
+        category: raw.category || "Other",
+        price: Number.isFinite(price) && price >= 0 ? price : 0,
+        description: raw.description || ""
+    };
 }
 
 // ---------- Skill cards ----------
@@ -96,21 +70,32 @@ function createSkillCard(skill) {
     meta.className = "card-meta";
     const provider = document.createElement("span");
     provider.className = "provider";
-    provider.textContent = skill.provider;
+    provider.textContent = skill.provider || "";
     const price = document.createElement("span");
     price.className = skill.price === 0 ? "price price-free" : "price";
     price.textContent = formatPrice(skill.price);
     meta.append(provider, price);
 
-    const details = document.createElement("div");
-    details.className = "card-details";
-    details.append(
-        createDetail("Background", skill.background),
-        createDetail("Teaching style", skill.style),
-        createDetail("Availability", skill.availability)
-    );
+    card.append(tag, title, desc, meta);
 
-    card.append(tag, title, desc, meta, details);
+    // Only show the extra details the database actually has for this skill
+    const detailRows = [
+        ["Background", skill.background],
+        ["Teaching style", skill.style],
+        ["Availability", skill.availability]
+    ].filter(function (row) {
+        return row[1];
+    });
+
+    if (detailRows.length > 0) {
+        const details = document.createElement("div");
+        details.className = "card-details";
+        details.append(...detailRows.map(function (row) {
+            return createDetail(row[0], row[1]);
+        }));
+        card.append(details);
+    }
+
     return card;
 }
 
@@ -144,31 +129,120 @@ document.addEventListener("keydown", function (event) {
 });
 
 // ---------- Category filter ----------
-// AI-generated (Claude): filter buttons call filterSkillsByCategory()
-const filterButtons = document.querySelectorAll(".filter-btn");
+// AI-generated (Claude): filter buttons call filterSkillsByCategory().
+// The buttons are built from the categories in the database, so a new
+// category added through the form gets its own button automatically.
+const filterBar = document.getElementById("filter-bar");
 const resultCount = document.getElementById("result-count");
+const matchCategorySelect = document.getElementById("match-category");
+const categoryList = document.getElementById("category-list");
+
+function getCategories(list) {
+    const unique = new Set(list.map(function (skill) {
+        return skill.category;
+    }));
+    return Array.from(unique).sort();
+}
+
+function createFilterButton(category) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "filter-btn";
+    button.dataset.category = category;
+    button.textContent = category;
+    button.setAttribute("aria-pressed", "false");
+    return button;
+}
+
+function buildCategoryControls() {
+    const categories = getCategories(skills);
+
+    // Filter bar: "All" first, then one button per category
+    filterBar.replaceChildren(
+        createFilterButton("All"),
+        ...categories.map(createFilterButton)
+    );
+
+    // Find My Match dropdown: keep what the user had picked if it still exists
+    const previous = matchCategorySelect.value;
+    const options = categories.map(function (category) {
+        return new Option(category, category);
+    });
+    options.push(new Option("Any category", "All"));
+    matchCategorySelect.replaceChildren(...options);
+    if (previous && (previous === "All" || categories.includes(previous))) {
+        matchCategorySelect.value = previous;
+    }
+
+    // Suggestions for the category field in the "Offer a Skill" form
+    categoryList.replaceChildren(...categories.map(function (category) {
+        return new Option(category);
+    }));
+}
 
 function showCategory(category) {
+    currentCategory = category;
     const filtered = filterSkillsByCategory(skills, category);
     renderSkills(filtered, skillGrid);
 
     const label = category === "All" ? "skills" : category + " skills";
     resultCount.textContent = "Showing " + filtered.length + " " + label;
+    resultCount.classList.remove("error");
 
-    filterButtons.forEach(function (button) {
+    filterBar.querySelectorAll(".filter-btn").forEach(function (button) {
         const isActive = button.dataset.category === category;
         button.classList.toggle("active", isActive);
         button.setAttribute("aria-pressed", String(isActive));
     });
 }
 
-filterButtons.forEach(function (button) {
-    button.addEventListener("click", function () {
+// One listener on the bar handles every button, including ones added later
+filterBar.addEventListener("click", function (event) {
+    const button = event.target.closest(".filter-btn");
+    if (button) {
         showCategory(button.dataset.category);
-    });
+    }
 });
 
-showCategory("All");
+// ---------- Load skills from the API ----------
+// Calls fetchSkills() and waits for the Promise to resolve, then stores the
+// data and redraws the page. Returns the skills so other code can await it.
+const reloadButton = document.getElementById("reload-skills");
+
+async function loadSkills() {
+    showMessage(resultCount, "Loading skills...");
+    skillGrid.setAttribute("aria-busy", "true");
+    reloadButton.hidden = true;
+
+    try {
+        const data = await window.apiService.fetchSkills();
+        // Accept either a plain array or an object like { skills: [...] }
+        const list = Array.isArray(data) ? data : (data.skills || data.data || []);
+        skills = list.map(normalizeSkill);
+
+        buildCategoryControls();
+        const stillExists = currentCategory === "All" ||
+            skills.some(function (skill) { return skill.category === currentCategory; });
+        showCategory(stillExists ? currentCategory : "All");
+        return skills;
+    } catch (error) {
+        skills = [];
+        skillGrid.replaceChildren();
+        showMessage(
+            resultCount,
+            "Couldn't load skills. Make sure the backend server is running at http://localhost:3000, then try again.",
+            true
+        );
+        reloadButton.hidden = false;
+        return skills;
+    } finally {
+        skillGrid.removeAttribute("aria-busy");
+    }
+}
+
+reloadButton.addEventListener("click", loadSkills);
+
+loadSkills();
 
 // ---------- Cost calculator ----------
 // AI-generated (Claude): form calls calculateTotalCost()
@@ -240,5 +314,62 @@ matchForm.addEventListener("submit", function (event) {
     } else {
         const noun = matches.length === 1 ? "match" : "matches";
         showMessage(matchSummary, matches.length + " " + free + noun + " " + where + budget + ".");
+    }
+});
+
+// ---------- Offer a Skill (create) ----------
+// On submit, send the new skill to the API with createSkill(). Once the
+// database has saved it, reload every skill with loadSkills() so the new
+// card shows up and stays there after a page refresh.
+const skillForm = document.getElementById("skill-form");
+const skillTitleInput = document.getElementById("skill-title");
+const skillCategoryInput = document.getElementById("skill-category");
+const skillPriceInput = document.getElementById("skill-price");
+const skillDescriptionInput = document.getElementById("skill-description");
+const skillFormResult = document.getElementById("skill-form-result");
+const skillSubmitButton = document.getElementById("skill-submit");
+
+skillForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const title = skillTitleInput.value.trim();
+    const category = skillCategoryInput.value.trim();
+    const priceText = skillPriceInput.value.trim();
+    const description = skillDescriptionInput.value.trim();
+
+    if (!title || !category || priceText === "" || !description) {
+        showMessage(skillFormResult, "Fill in the title, category, price, and description.", true);
+        return;
+    }
+
+    const price = Number(priceText);
+    if (!Number.isFinite(price) || price < 0) {
+        showMessage(skillFormResult, "Price must be 0 (free) or more.", true);
+        return;
+    }
+
+    // Stop double submits while the request is in flight
+    skillSubmitButton.disabled = true;
+    showMessage(skillFormResult, "Saving your skill...");
+
+    try {
+        const created = await window.apiService.createSkill({
+            title: title,
+            category: category,
+            price: price,
+            description: description
+        });
+
+        skillForm.reset();
+        await loadSkills();
+        showMessage(skillFormResult, "\"" + (created.title || title) + "\" was added to Skill Swap.");
+    } catch (error) {
+        showMessage(
+            skillFormResult,
+            "Couldn't save your skill. Make sure the backend server is running, then try again.",
+            true
+        );
+    } finally {
+        skillSubmitButton.disabled = false;
     }
 });
